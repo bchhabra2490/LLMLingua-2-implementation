@@ -1,5 +1,7 @@
 __pycache__/
 *.jsonl
+*.safetensors
 checkpoint-*/
+checkpoints/**/checkpoint-*/
 */.DS_Store
-checkpoints/token-compressor/model.safetensors
+.venv/
