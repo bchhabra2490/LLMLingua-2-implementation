@@ -12,5 +12,7 @@ services:
         value: "3.11.11"
       - key: FORCE_CPU
         value: "1"
+      - key: HF_MODEL_ID
+        value: bchhabra2490/llmlingua2-compressor
       - key: MODEL_URL
-        sync: false
+        value: https://huggingface.co/bchhabra2490/llmlingua2-compressor

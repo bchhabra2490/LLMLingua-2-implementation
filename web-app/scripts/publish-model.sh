@@ -40,6 +40,7 @@ api.upload_folder(
     repo_type="model",
     ignore_patterns=["checkpoint-*"],
 )
-print(f"Uploaded. Set MODEL_URL to:")
-print(f"https://huggingface.co/{repo_id}/resolve/main/model.safetensors")
+print(f"Uploaded. Use either env var on Render:")
+print(f"  HF_MODEL_ID={repo_id}")
+print(f"  MODEL_URL=https://huggingface.co/{repo_id}")
 PY
