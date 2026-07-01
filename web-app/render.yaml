@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: llmlingua2-compressor
+    runtime: python
+    rootDir: web-app
+    plan: starter
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 app:app
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+      - key: FORCE_CPU
+        value: "1"
+      - key: MODEL_URL
+        sync: false

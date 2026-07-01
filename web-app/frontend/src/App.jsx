@@ -10,11 +10,17 @@ export default function App() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [checkpoint, setCheckpoint] = useState("");
+  const [modelLoaded, setModelLoaded] = useState(false);
+  const [modelError, setModelError] = useState("");
 
   useEffect(() => {
     fetch("/api/health")
       .then((res) => res.json())
-      .then((data) => setCheckpoint(data.checkpoint || ""))
+      .then((data) => {
+        setCheckpoint(data.checkpoint || "");
+        setModelLoaded(Boolean(data.model_loaded));
+        setModelError(data.model_error || "");
+      })
       .catch(() => setCheckpoint("unavailable"));
   }, []);
 
@@ -53,6 +59,14 @@ export default function App() {
         </p>
         {checkpoint && (
           <span className="badge">Checkpoint: {checkpoint}</span>
+        )}
+        {!modelLoaded && !modelError && (
+          <span className="badge">Loading model...</span>
+        )}
+        {modelError && (
+          <span className="badge" style={{ borderColor: "rgba(239, 68, 68, 0.4)", color: "#fca5a5" }}>
+            Model error: {modelError}
+          </span>
         )}
       </header>
 

@@ -2,22 +2,12 @@
 
 from __future__ import annotations
 
-import re
-from pathlib import Path
+import os
 
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-CHECKPOINT_ROOT = Path(__file__).resolve().parents[2] / "checkpoints" / "token-compressor"
-
-
-def resolve_latest_checkpoint(root: Path = CHECKPOINT_ROOT) -> Path:
-    checkpoints = [
-        p for p in root.iterdir() if p.is_dir() and re.fullmatch(r"checkpoint-\d+", p.name)
-    ]
-    if checkpoints:
-        return max(checkpoints, key=lambda p: int(p.name.split("-", 1)[1]))
-    return root
+from model_utils import ensure_model_weights, resolve_latest_checkpoint
 
 
 def compress(text: str, tokenizer, model, ratio: float = 0.5) -> dict:
@@ -59,15 +49,16 @@ def compress(text: str, tokenizer, model, ratio: float = 0.5) -> dict:
 
 
 class CompressorService:
-    def __init__(self, checkpoint_path: Path | None = None):
+    def __init__(self, checkpoint_path=None):
+        ensure_model_weights()
         self.checkpoint_path = checkpoint_path or resolve_latest_checkpoint()
         self.tokenizer = AutoTokenizer.from_pretrained(str(self.checkpoint_path))
         self.model = AutoModelForTokenClassification.from_pretrained(str(self.checkpoint_path))
         self.model.eval()
 
-        if torch.backends.mps.is_available():
+        if torch.backends.mps.is_available() and os.environ.get("FORCE_CPU") != "1":
             self.device = torch.device("mps")
-        elif torch.cuda.is_available():
+        elif torch.cuda.is_available() and os.environ.get("FORCE_CPU") != "1":
             self.device = torch.device("cuda")
         else:
             self.device = torch.device("cpu")
