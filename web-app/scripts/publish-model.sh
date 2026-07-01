@@ -7,7 +7,8 @@
 #   ./scripts/publish-model.sh your-username/llmlingua2-compressor
 #
 # Then set this on Render:
-#   MODEL_URL=https://huggingface.co/your-username/llmlingua2-compressor/resolve/main/model.safetensors
+#   HF_MODEL_ID=your-username/llmlingua2-compressor
+#   MODEL_URL=https://huggingface.co/your-username/llmlingua2-compressor
 
 set -euo pipefail
 
@@ -26,13 +27,17 @@ if [ ! -f "$CHECKPOINT_DIR/model.safetensors" ]; then
 fi
 
 echo "Uploading from $CHECKPOINT_DIR to hf://$REPO_ID"
-python3 - <<PY
+
+export REPO_ID CHECKPOINT_DIR
+python3 <<'PY'
+import os
+
 from huggingface_hub import HfApi
 
-api = HfApi()
-repo_id = "$REPO_ID"
-checkpoint = "$CHECKPOINT_DIR"
+repo_id = os.environ["REPO_ID"]
+checkpoint = os.environ["CHECKPOINT_DIR"]
 
+api = HfApi()
 api.create_repo(repo_id, exist_ok=True)
 api.upload_folder(
     folder_path=checkpoint,
@@ -40,7 +45,8 @@ api.upload_folder(
     repo_type="model",
     ignore_patterns=["checkpoint-*"],
 )
-print(f"Uploaded. Use either env var on Render:")
+
+print("Uploaded. Use either env var on Render:")
 print(f"  HF_MODEL_ID={repo_id}")
 print(f"  MODEL_URL=https://huggingface.co/{repo_id}")
 PY

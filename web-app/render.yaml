@@ -15,4 +15,4 @@ services:
       - key: HF_MODEL_ID
         value: bchhabra2490/llmlingua2-compressor
       - key: MODEL_URL
-        value: https://huggingface.co/bchhabra2490/llmlingua2-compressor
+        value: https://huggingface.co/bchhabra2490/llmlingua2-compressor/resolve/main/model.safetensors
